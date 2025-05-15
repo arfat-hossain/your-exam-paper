@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام ملفات الامتحانات حسب الصفوف</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+            --gray-color: #95a5a6;
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Tajawal', Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 15px;
+        }
+        
+        header {
+            background: var(--dark-color);
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+            border-radius: 0 0 10px 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            font-size: 1rem;
+            background-color: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .grade-filter {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            font-size: 1rem;
+            background-color: white;
+            min-width: 150px;
+        }
+        
+        .file-card {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        
+        .file-card:hover {
+            transform: translateY(-3px);
+        }
+        
+        .file-card h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+            font-size: 1.2rem;
+        }
+        
+        .file-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 10px 0;
+            font-size: 0.9rem;
+            color: var(--gray-color);
+        }
+        
+        .file-meta span {
+            background: var(--light-color);
+            padding: 3px 8px;
+            border-radius: 15px;
+        }
+        
+        .grade-5 { border-right: 4px solid #16a085; }
+        .grade-6 { border-right: 4px solid #27ae60; }
+        .grade-7 { border-right: 4px solid #2980b9; }
+        .grade-8 { border-right: 4px solid #8e44ad; }
+        .grade-9 { border-right: 4px solid #f39c12; }
+        .grade-10 { border-right: 4px solid #d35400; }
+        .grade-11 { border-right: 4px solid #c0392b; }
+        .grade-12 { border-right: 4px solid #7f8c8d; }
+        
+        .file-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 10px 15px;
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            text-align: center;
+            flex: 1;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        
+        .btn-preview {
+            background: var(--secondary-color);
+        }
+        
+        .btn-preview:hover {
+            background: #27ae60;
+            box-shadow: 0 2px 5px rgba(46, 204, 113, 0.3);
+        }
+        
+        .btn-download {
+            background: var(--danger-color);
+        }
+        
+        .btn-download:hover {
+            background: #c0392b;
+            box-shadow: 0 2px 5px rgba(231, 76, 60, 0.3);
+        }
+        
+        .no-files {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray-color);
+            font-size: 1.1rem;
+        }
+        
+        /* تحسينات للشاشات الكبيرة */
+        @media (min-width: 768px) {
+            .container {
+                max-width: 750px;
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .file-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+                gap: 20px;
+            }
+            
+            .file-card {
+                margin-bottom: 0;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+        <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-container">
+                    <img src="exam.png" alt="شعار المدرسة" class="logo">
+                </div>
+                <h1> ملفات الامتحانات  </h1>
+                <div class="whatsapp-link">
+                    <a href="https://wa.me/+96871858099" target="_blank">
+                        <i class="fab fa-whatsapp"></i>
+                        <span>واتساب</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        </header>
+        <style>
+            .header-content {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                width: 100%;
+            }
+
+            .logo-container {
+                width: 60px;
+                height: 60px;
+                font-size: 25px;
+            }
+
+            .logo {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+            }
+
+            .whatsapp-link a {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                color: white;
+                text-decoration: none;
+                background-color: #25D366;
+                padding: 8px 15px;
+                border-radius: 25px;
+                font-weight: bold;
+                transition: all 0.3s;
+            }
+
+            .whatsapp-link a:hover {
+                background-color: #128C7E;
+                box-shadow: 0 2px 10px rgba(37, 211, 102, 0.5);
+            }
+
+            .whatsapp-link i {
+                font-size: 1.2rem;
+            }
+
+            /* For mobile responsiveness */
+            @media (max-width: 768px) {
+                .header-content {
+                    flex-direction: column;
+                    gap: 15px;
+                }
+                
+                h1 {
+                    order: 2;
+                    margin: 10px 0;
+                }
+                
+                .logo-container {
+                    order: 1;
+                }
+                
+                .whatsapp-link {
+                    order: 3;
+                }
+            }
+        </style>
+    
+    <div class="container">
+        <div class="controls">
+            <input type="text" class="search-box" placeholder="ابحث عن ملف..." id="searchInput">
+            <select class="grade-filter" id="gradeFilter">
+                <option value="all">جميع الصفوف</option>
+                <option value="5">الصف الخامس</option>
+                <option value="6">الصف السادس</option>
+                <option value="7">الصف السابع</option>
+                <option value="8">الصف الثامن</option>
+                <option value="9">الصف التاسع</option>
+                <option value="10">الصف العاشر</option>
+                <option value="11">الصف الحادي عشر</option>
+                <option value="12">الصف الثاني عشر</option>
+            </select>
+        </div>
+        
+        <div class="file-grid" id="filesContainer">
+            <!-- سيتم إضافة الملفات هنا عبر JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        // بيانات الملفات (يمكن استبدالها بروابط جوجل درايف الفعلية)
+        const examFiles = [
+            //التربية الإسلامية للصف الخامس  الفصل الثاني 2023/2024
+            {
+                id: 1,
+                title: " التربية الإسلامية - للصف الخامس",
+                description: " امتحان التربية الإسلامية الفصل الثاني 2023-2024 البريمي",
+                previewLink: "https://drive.google.com/file/d/1Z0dxyzOHmwq-55GAZg1sZ5ca3M5xNbaU/preview",
+                downloadLink: "https://drive.google.com/file/d/1Z0dxyzOHmwq-55GAZg1sZ5ca3M5xNbaU/view?usp=sharing",
+                subject: "التربية الإسلامية",
+                grade: "5",
+                gradeName: "الصف الخامس",
+                date: "الدور الأول",
+                type: "نهائي"
+            },
+            {
+                id: 2,
+                title: " التربية الإسلامية - للصف الخامس",
+                description: " امتحان التربية الإسلامية الفصل الثاني 2023-2024 ظفار",
+                previewLink: "https://drive.google.com/file/d/1-ichiHRDZZI2QgQfxAwugav2ZOn6-YHL/preview",
+                downloadLink: "https://drive.google.com/file/d/1-ichiHRDZZI2QgQfxAwugav2ZOn6-YHL/view?usp=sharing",
+                subject: "التربية الإسلامية",
+                grade: "5",
+                gradeName: "الصف الخامس",
+                date: "الدور الأول",
+                type: "نهائي"
+            },
+            {
+                id: 3,
+                title: " التربية الإسلامية - للصف الخامس",
+                description: " امتحان التربية الإسلامية الفصل الثاني 2023-2024 ظفار",
+                previewLink: "https://drive.google.com/file/d/1ya9oJdbYf506sJsheijSd-nkujCdxrXj/preview",
+                downloadLink: "https://drive.google.com/file/d/1ya9oJdbYf506sJsheijSd-nkujCdxrXj/view?usp=sharing",
+                subject: "التربية الإسلامية",
+                grade: "5",
+                gradeName: "الصف الخامس",
+                date: "الدور الثاني",
+                type: "نهائي"
+            },
+            {
+                id: 4,
+                title: " التربية الإسلامية - للصف الخامس",
+                description: " امتحان التربية الإسلامية الفصل الثاني 2023-2024 مسقط",
+                previewLink: "https://drive.google.com/file/d/1VBv3QgXVp68TIeHgN_TxrAE8yTohoCsR/preview",
+                downloadLink: "https://drive.google.com/file/d/1VBv3QgXVp68TIeHgN_TxrAE8yTohoCsR/view?usp=sharing",
+                subject: "التربية الإسلامية",
+                grade: "5",
+                gradeName: "الصف الخامس",
+                date: " الفترة المسائية",
+                type: "نهائي"
+            },
+            {
+                id: 5,
+                title: " التربية الإسلامية - للصف الخامس",
+                description: " امتحان التربية الإسلامية الفصل الثاني 2023-2024 مسقط",
+                previewLink: "https://drive.google.com/file/d/1cxAFrMb64_oa463P00p39qkVOiwqRUHo/preview",
+                downloadLink: "https://drive.google.com/file/d/1cxAFrMb64_oa463P00p39qkVOiwqRUHo/view?usp=sharing",
+                subject: "التربية الإسلامية",
+                grade: "5",
+                gradeName: "الصف الخامس",
+                date: "الدور الأول",
+                type: "نهائي"
+            },
+            {
+                id: 6,
+                title: " التربية الإسلامية - للصف الخامس",
+                description: " امتحان التربية الإسلامية الفصل الثاني 2023-2024 مسقط",
+                previewLink: "https://drive.google.com/file/d/1qXGOuvLM_1MBOYTMWnR8qftJ8k05BfKG/preview",
+                downloadLink: "https://drive.google.com/file/d/1qXGOuvLM_1MBOYTMWnR8qftJ8k05BfKG/view?usp=sharing",
+                subject: "التربية الإسلامية",
+                grade: "5",
+                gradeName: "الصف الخامس",
+                date: "الدور الثاني",
+                type: "نهائي"
+            },
+            //الدراسات الإجتماعية  للصف الخامس  الفصل الثاني 2023/2024
+            {
+                id: 7,
+                title: " الدراسات الإجتماعية  - للصف الخامس",
+                description: " امتحان  الدراسات الإجتماعية الفصل الثاني 2023-2024 مسقط",
+                previewLink: "https://drive.google.com/file/d/1C95w0aC2R7oy9KUfUiciNMPekFa6zUNU/preview",
+                downloadLink: "https://drive.google.com/file/d/1C95w0aC2R7oy9KUfUiciNMPekFa6zUNU/view?usp=sharing",
+                subject: "الدراسات الإجتماعية",
+                grade: "5",
+                gradeName: "الصف الخامس",
+                date: "الفترة المسائية ",
+                type: "نهائي"
+            },
+            {
+                id: 8,
+                title: " الدراسات الإجتماعية  - للصف الخامس",
+                description: " امتحان  الدراسات الإجتماعية الفصل الثاني 2023-2024 مسقط",
+                previewLink: "https://drive.google.com/file/d/12_525wwOfltnOD_PPc7C7o5u8KhsA64l/preview",
+                downloadLink: "https://drive.google.com/file/d/12_525wwOfltnOD_PPc7C7o5u8KhsA64l/view?usp=sharing",
+                subject: "الدراسات الإجتماعية",
+                grade: "5",
+                gradeName: "الصف الخامس",
+                date: "الدور الأول",
+                type: "نهائي"
+            },
+            {
+                id: 9,
+                title: " الدراسات الإجتماعية  - للصف الخامس",
+                description: " امتحان  الدراسات الإجتماعية الفصل الثاني 2023-2024 مسقط",
+                previewLink: "https://drive.google.com/file/d/1nHec0pcLM6gqyMYcEk03XPJTeqSyvl_Q/preview",
+                downloadLink: "https://drive.google.com/file/d/1nHec0pcLM6gqyMYcEk03XPJTeqSyvl_Q/view?usp=sharing",
+                subject: "الدراسات الإجتماعية",
+                grade: "5",
+                gradeName: "الصف الخامس",
+                date: "الدور الثاني",
+                type: "نهائي"
+            },
+            {
+                id: 10,
+                title: " الدراسات الإجتماعية  - للصف الخامس",
+                description: " امتحان  الدراسات الإجتماعية الفصل الثاني 2023-2024 ظفار",
+                previewLink: "https://drive.google.com/file/d/1PAv4mwgjyK4IgwYDHAgB1NQLm3jMs7Ee/preview",
+                downloadLink: "https://drive.google.com/file/d/1PAv4mwgjyK4IgwYDHAgB1NQLm3jMs7Ee/view?usp=sharing",
+                subject: "الدراسات الإجتماعية",
+                grade: "5",
+                gradeName: "الصف الخامس",
+                date: " الفترة الصباحية",
+                type: "نهائي"
+            },
+            {
+                id: 11,
+                title: " الدراسات الإجتماعية  - للصف الخامس",
+                description: " امتحان  الدراسات الإجتماعية الفصل الثاني 2023-2024 ظفار",
+                previewLink: "https://drive.google.com/file/d/1L-79QLeAucc1f5dVknKEKc3a7Rsc-vxz/preview",
+                downloadLink: "https://drive.google.com/file/d/1L-79QLeAucc1f5dVknKEKc3a7Rsc-vxz/view?usp=sharing",
+                subject: "الدراسات الإجتماعية",
+                grade: "5",
+                gradeName: "الصف الخامس",
+                date: "الدور الثاني",
+                type: "نهائي"
+            },
+            //الرياضيات  للصف الخامس  الفصل الثاني 2023/2024
+            {
+                id: 12,
+                title: "  الرياضيات  - للصف الخامس",
+                description: " امتحان الرياضيات  الفصل الثاني 2023-2024 البريمي",
+                previewLink: "https://drive.google.com/file/d/1j_VnCmsKpiagiM6CLyYBpBdH0GpLgO6I/preview",
+                downloadLink: "https://drive.google.com/file/d/1j_VnCmsKpiagiM6CLyYBpBdH0GpLgO6I/view?usp=sharing",
+                subject: " الرياضيات",
+                grade: "5",
+                gradeName: "الصف الخامس",
+                date: "الدور الأول",
+                type: "نهائي"
+            },
+            {
+                id: 13,
+                title: "  الرياضيات  - للصف الخامس",
+                description: " امتحان  الرياضيات الفصل الثاني 2023-2024 ظفار",
+                previewLink: "https://drive.google.com/file/d/1AltnVQGN3xwLI9eyR64oO1e95cVNZuSZ/preview",
+                downloadLink: "https://drive.google.com/file/d/1AltnVQGN3xwLI9eyR64oO1e95cVNZuSZ/view?usp=sharing",
+                subject: " الرياضيات",
+                grade: "5",
+                gradeName: "الصف الخامس",
+                date: "الفترة الصباحية ",
+                type: "نهائي"
+            },
+            {
+                id: 14,
+                title: "  الرياضيات  - للصف الخامس",
+                description: " امتحان  الرياضيات الفصل الثاني 2023-2024 ظفار",
+                previewLink: "https://drive.google.com/file/d/1w9ryXcn6AsnpVv5k1lvk3ONNCAW1whK_/preview",
+                downloadLink: "https://drive.google.com/file/d/1w9ryXcn6AsnpVv5k1lvk3ONNCAW1whK_/view?usp=sharing",
+                subject: " الرياضيات",
+                grade: "5",
+                gradeName: "الصف الخامس",
+                date: "الدور الثاني",
+                type: "نهائي"
+            },
+            {
+                id: 15,
+                title: "  الرياضيات  - للصف الخامس",
+                description: " امتحان  الرياضيات الفصل الثاني 2023-2024 مسقط",
+                previewLink: "https://drive.google.com/file/d/13xxpyVCpxGiDPDbs55QKCmTLykfC4M6A/preview",
+                downloadLink: "https://drive.google.com/file/d/13xxpyVCpxGiDPDbs55QKCmTLykfC4M6A/view?usp=sharing",
+                subject: " الرياضيات",
+                grade: "5",
+                gradeName: "الصف الخامس",
+                date: "الفترة المسائية ",
+                type: "نهائي"
+            },
+                        {
+                id: 16,
+                title: "  الرياضيات  - للصف الخامس",
+                description: " امتحان  الرياضيات الفصل الثاني 2023-2024 مسقط",
+                previewLink: "https://drive.google.com/file/d/1PTaVcSbu0XzVTGI8f4PzDw84RNfbaNnX/preview",
+                downloadLink: "https://drive.google.com/file/d/1PTaVcSbu0XzVTGI8f4PzDw84RNfbaNnX/view?usp=sharing",
+                subject: " الرياضيات",
+                grade: "5",
+                gradeName: "الصف الخامس",
+                date: "الدور الأول",
+                type: "نهائي"
+            },
+            {
+                id: 17,
+                title: "  الرياضيات  - للصف الخامس",
+                description: " امتحان  الرياضيات الفصل الثاني 2023-2024 مسقط",
+                previewLink: "https://drive.google.com/file/d/1lMoRPNVe-mw7mAhNgxIJDtApvS1vzmGC/preview",
+                downloadLink: "https://drive.google.com/file/d/1lMoRPNVe-mw7mAhNgxIJDtApvS1vzmGC/view?usp=sharing",
+                subject: " الرياضيات",
+                grade: "5",
+                gradeName: "الصف الخامس",
+                date: "الدور الثاني",
+                type: "نهائي"
+            },
+            //العلوم  للصف الخامس  الفصل الثاني 2023/2024
+            {
+                id: 17,
+                title: "  العلوم  - للصف الخامس",
+                description: " امتحان  العلوم الفصل الثاني 2023-2024 ظفار",
+                previewLink: "https://drive.google.com/file/d/1Z9rSLu2NBClu4GzlB51KyNs0ZPBv62Ra/preview",
+                downloadLink: "https://drive.google.com/file/d/1Z9rSLu2NBClu4GzlB51KyNs0ZPBv62Ra/view?usp=sharing",
+                subject: " العلوم",
+                grade: "5",
+                gradeName: "الصف الخامس",
+                date: "الفترة الصباحية - الدور الأول ",
+                type: "نهائي"
+            },
+            {
+                id: 17,
+                title: "  العلوم  - للصف الخامس",
+                description: " امتحان  العلوم الفصل الثاني 2023-2024 ظفار",
+                previewLink: "https://drive.google.com/file/d/1IS8ShAf_vgHUCaDtN35msyzbhAIFBRzk/preview",
+                downloadLink: "https://drive.google.com/file/d/1IS8ShAf_vgHUCaDtN35msyzbhAIFBRzk/view?usp=sharing",
+                subject: " العلوم",
+                grade: "5",
+                gradeName: "الصف الخامس",
+                date: " الدور الثاني ",
+                type: "نهائي"
+            },  
+            {
+                id: 17,
+                title: "  العلوم  - للصف الخامس",
+                description: " امتحان  العلوم الفصل الثاني 2023-2024 مسقط",
+                previewLink: "https://drive.google.com/file/d/1bArFGhMGKEkyGpy1wRPdc4bg2tBouHqV/preview",
+                downloadLink: "https://drive.google.com/file/d/1bArFGhMGKEkyGpy1wRPdc4bg2tBouHqV/view?usp=sharing",
+                subject: " العلوم",
+                grade: "5",
+                gradeName: "الصف الخامس",
+                date: "الفترة المسائية - الدور الأول ",
+                type: "نهائي"
+            },
+            {
+                id: 17,
+                title: "  العلوم  - للصف الخامس",
+                description: " امتحان  العلوم الفصل الثاني 2023-2024 مسقط",
+                previewLink: "https://drive.google.com/file/d/1UJJToUhBGV8cot1RWJYfHlKTIXZrejRF/preview",
+                downloadLink: "https://drive.google.com/file/d/1UJJToUhBGV8cot1RWJYfHlKTIXZrejRF/view?usp=sharing",
+                subject: " العلوم",
+                grade: "5",
+                gradeName: "الصف الخامس",
+                date: "  الدور الأول ",
+                type: "نهائي"
+            },
+            {
+                id: 17,
+                title: "  العلوم  - للصف الخامس",
+                description: " امتحان  العلوم الفصل الثاني 2023-2024 مسقط",
+                previewLink: "https://drive.google.com/file/d/1NU7VWD1IShgQ0pl_2luyhPn4n6i3KRCb/preview",
+                downloadLink: "https://drive.google.com/file/d/1NU7VWD1IShgQ0pl_2luyhPn4n6i3KRCb/view?usp=sharing",
+                subject: " العلوم",
+                grade: "5",
+                gradeName: "الصف الخامس",
+                date: "  الدور الثاني ",
+                type: "نهائي"
+            },
+
+            
+            
+        ];
+
+        // عرض الملفات في الصفحة
+        function displayFiles(files) {
+            const container = document.getElementById('filesContainer');
+            
+            if (files.length === 0) {
+                container.innerHTML = '<div class="no-files">لا توجد ملفات متطابقة مع بحثك</div>';
+                return;
+            }
+            
+            container.innerHTML = '';
+            
+            files.forEach(file => {
+                const fileCard = document.createElement('div');
+                fileCard.className = `file-card grade-${file.grade}`;
+                
+                fileCard.innerHTML = `
+                    <h3>${file.title}</h3>
+                    <p>${file.description}</p>
+                    <div class="file-meta">
+                        <span>${file.subject}</span>
+                        <span>${file.gradeName}</span>
+                        <span>${file.type}</span>
+                        <span>${file.date}</span>
+                    </div>
+                    <div class="file-actions">
+                        <a href="${file.previewLink}" target="_blank" class="btn btn-preview">
+                            <i class="fas fa-eye"></i> معاينة
+                        </a>
+                        <a href="${file.downloadLink}" class="btn btn-download">
+                            <i class="fas fa-download"></i> تنزيل
+                        </a>
+                    </div>
+                `;
+                
+                container.appendChild(fileCard);
+            });
+        }
+
+        // فلترة الملفات حسب البحث والصف
+        function filterFiles() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const selectedGrade = document.getElementById('gradeFilter').value;
+            
+            const filteredFiles = examFiles.filter(file => {
+                const matchesSearch = 
+                    file.title.toLowerCase().includes(searchTerm) || 
+                    file.description.toLowerCase().includes(searchTerm) || 
+                    file.subject.toLowerCase().includes(searchTerm) || 
+                    file.type.toLowerCase().includes(searchTerm);
+                
+                const matchesGrade = selectedGrade === 'all' || file.grade === selectedGrade;
+                
+                return matchesSearch && matchesGrade;
+            });
+            
+            displayFiles(filteredFiles);
+        }
+
+        // إضافة مستمعين للأحداث
+        document.getElementById('searchInput').addEventListener('input', filterFiles);
+        document.getElementById('gradeFilter').addEventListener('change', filterFiles);
+
+        // عرض جميع الملفات عند تحميل الصفحة
+        displayFiles(examFiles);
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</body>
+</html>
