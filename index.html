@@ -4,15 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>نظام ملفات الامتحانات حسب الصفوف</title>
-            <!-- Google tag (gtag.js) -->
-            <script async src="https://www.googletagmanager.com/gtag/js?id=G-H43M26PKQ3"></script>
-            <script>
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-
-              gtag('config', 'G-H43M26PKQ3');
-            </script>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-H43M26PKQ3"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-H43M26PKQ3');
+    </script>
     <style>
         :root {
             --primary-color: #3498db;
@@ -25,13 +24,13 @@
         
         * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
         
         body {
             font-family: 'Tajawal', Arial, sans-serif;
             line-height: 1.6;
-            margin: 0;
-            padding: 0;
             background-color: #f5f5f5;
             color: #333;
         }
@@ -75,7 +74,7 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         
-        .grade-filter {
+        .grade-filter, .subject-filter {
             padding: 12px 15px;
             border: 1px solid #ddd;
             border-radius: 25px;
@@ -84,30 +83,37 @@
             min-width: 150px;
         }
         
+        .file-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+        
         .file-card {
             border: 1px solid #ddd;
             border-radius: 10px;
             padding: 15px;
-            margin-bottom: 15px;
             background: white;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            transition: transform 0.2s;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
         
         .file-card:hover {
             transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
         
         .file-card h3 {
             margin-top: 0;
             color: var(--primary-color);
             font-size: 1.2rem;
+            margin-bottom: 10px;
         }
         
         .file-meta {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 8px;
             margin: 10px 0;
             font-size: 0.9rem;
             color: var(--gray-color);
@@ -115,8 +121,9 @@
         
         .file-meta span {
             background: var(--light-color);
-            padding: 3px 8px;
+            padding: 4px 10px;
             border-radius: 15px;
+            white-space: nowrap;
         }
         
         .grade-5 { border-right: 4px solid #16a085; }
@@ -135,7 +142,9 @@
         }
         
         .btn {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             padding: 10px 15px;
             color: white;
             text-decoration: none;
@@ -145,6 +154,7 @@
             font-weight: bold;
             font-size: 0.9rem;
             transition: all 0.3s;
+            gap: 5px;
         }
         
         .btn-preview {
@@ -170,12 +180,77 @@
             padding: 40px 20px;
             color: var(--gray-color);
             font-size: 1.1rem;
+            grid-column: 1 / -1;
         }
-        
-        /* تحسينات للشاشات الكبيرة */
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            flex-wrap: wrap;
+        }
+
+        .logo-container {
+            width: 60px;
+            height: 60px;
+            font-size: 25px;
+        }
+
+        .logo {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .whatsapp-link a {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            text-decoration: none;
+            background-color: #25D366;
+            padding: 8px 15px;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .whatsapp-link a:hover {
+            background-color: #128C7E;
+            box-shadow: 0 2px 10px rgba(37, 211, 102, 0.5);
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 5px;
+        }
+
+        .page-btn {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .page-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
         @media (min-width: 768px) {
             .container {
-                max-width: 750px;
+                max-width: 1200px;
                 padding: 20px;
             }
             
@@ -184,26 +259,23 @@
             }
             
             .file-grid {
-                display: grid;
                 grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-                gap: 20px;
             }
-            
-            .file-card {
-                margin-bottom: 0;
+
+            .header-content {
+                flex-wrap: nowrap;
             }
         }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-        <header>
+    <header>
         <div class="container">
             <div class="header-content">
-                <div class="logo-container">
-                    <img src="exam.png" alt="شعار المدرسة" class="logo">
-                </div>
-                <h1> ملفات الامتحانات  </h1>
+
+                <h1>ملفات الامتحانات</h1>
                 <div class="whatsapp-link">
                     <a href="https://wa.me/+96871858099" target="_blank">
                         <i class="fab fa-whatsapp"></i>
@@ -212,96 +284,45 @@
                 </div>
             </div>
         </div>
-        </header>
-        <style>
-            .header-content {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                width: 100%;
-            }
-
-            .logo-container {
-                width: 60px;
-                height: 60px;
-                font-size: 25px;
-            }
-
-            .logo {
-                width: 100%;
-                height: 100%;
-                object-fit: contain;
-            }
-
-            .whatsapp-link a {
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                color: white;
-                text-decoration: none;
-                background-color: #25D366;
-                padding: 8px 15px;
-                border-radius: 25px;
-                font-weight: bold;
-                transition: all 0.3s;
-            }
-
-            .whatsapp-link a:hover {
-                background-color: #128C7E;
-                box-shadow: 0 2px 10px rgba(37, 211, 102, 0.5);
-            }
-
-            .whatsapp-link i {
-                font-size: 1.2rem;
-            }
-
-            /* For mobile responsiveness */
-            @media (max-width: 768px) {
-                .header-content {
-                    flex-direction: column;
-                    gap: 15px;
-                }
-                
-                h1 {
-                    order: 2;
-                    margin: 10px 0;
-                }
-                
-                .logo-container {
-                    order: 1;
-                }
-                
-                .whatsapp-link {
-                    order: 3;
-                }
-            }
-        </style>
+    </header>
     
     <div class="container">
         <div class="controls">
             <input type="text" class="search-box" placeholder="ابحث عن ملف..." id="searchInput">
-            <select class="grade-filter" id="gradeFilter">
-                <option value="all">جميع الصفوف</option>
-                <option value="5">الصف الخامس</option>
-                <option value="6">الصف السادس</option>
-                <option value="7">الصف السابع</option>
-                <option value="8">الصف الثامن</option>
-                <option value="9">الصف التاسع</option>
-                <option value="10">الصف العاشر</option>
-                <option value="11">الصف الحادي عشر</option>
-                <option value="12">الصف الثاني عشر</option>
-            </select>
+            
+            <div class="filter-group">
+                <select class="grade-filter" id="gradeFilter">
+                    <option value="all">جميع الصفوف</option>
+                    <option value="5">الصف الخامس</option>
+                    <option value="6">الصف السادس</option>
+                    <option value="7">الصف السابع</option>
+                    <option value="8">الصف الثامن</option>
+                    <option value="9">الصف التاسع</option>
+                    <option value="10">الصف العاشر</option>
+                    <option value="11">الصف الحادي عشر</option>
+                    <option value="12">الصف الثاني عشر</option>
+                </select>
+                
+                <select class="subject-filter" id="subjectFilter">
+                    <option value="all">جميع المواد</option>
+                    <!-- Subjects will be populated by JavaScript -->
+                </select>
+            </div>
         </div>
         
         <div class="file-grid" id="filesContainer">
-            <!-- سيتم إضافة الملفات هنا عبر JavaScript -->
+            <!-- Files will be loaded here by JavaScript -->
+        </div>
+        
+        <div class="pagination" id="pagination">
+            <!-- Pagination will be generated by JavaScript -->
         </div>
     </div>
 
     <script>
-        // بيانات الملفات (يمكن استبدالها بروابط جوجل درايف الفعلية)
+        // البيانات من ملف خارجي (يمكن استبدالها بطلب AJAX لملف JSON)
         const examFiles = [
-            //التربية الإسلامية للصف الخامس  الفصل الثاني 2023/2024
+                    //التربية الإسلامية للصف الخامس  الفصل الثاني 2023/2024
             {
                 id: 1,
                 title: " التربية الإسلامية - للصف الخامس",
@@ -1195,17 +1216,59 @@
         ];
 
         // عرض الملفات في الصفحة
-        function displayFiles(files) {
-            const container = document.getElementById('filesContainer');
+
+        // المتغيرات العامة
+        let currentPage = 1;
+        const filesPerPage = 12;
+        let filteredFiles = [...examFiles];
+
+        // تهيئة الصفحة عند التحميل
+        document.addEventListener('DOMContentLoaded', function() {
+            // تعبئة قائمة المواد
+            populateSubjects();
             
-            if (files.length === 0) {
-                container.innerHTML = '<div class="no-files">لا توجد ملفات متطابقة مع بحثك</div>';
-                return;
-            }
+            // عرض الملفات
+            displayFiles();
+            
+            // إضافة مستمعي الأحداث
+            document.getElementById('searchInput').addEventListener('input', filterFiles);
+            document.getElementById('gradeFilter').addEventListener('change', filterFiles);
+            document.getElementById('subjectFilter').addEventListener('change', filterFiles);
+        });
+
+        // تعبئة قائمة المواد من البيانات
+        function populateSubjects() {
+            const subjectFilter = document.getElementById('subjectFilter');
+            const subjects = [...new Set(examFiles.map(file => file.subject))];
+            
+            subjects.sort().forEach(subject => {
+                const option = document.createElement('option');
+                option.value = subject;
+                option.textContent = subject;
+                subjectFilter.appendChild(option);
+            });
+        }
+
+        // عرض الملفات مع التقسيم إلى صفحات
+        function displayFiles() {
+            const container = document.getElementById('filesContainer');
+            const pagination = document.getElementById('pagination');
             
             container.innerHTML = '';
             
-            files.forEach(file => {
+            if (filteredFiles.length === 0) {
+                container.innerHTML = '<div class="no-files">لا توجد ملفات متطابقة مع بحثك</div>';
+                pagination.innerHTML = '';
+                return;
+            }
+            
+            // حساب الملفات للصفحة الحالية
+            const startIndex = (currentPage - 1) * filesPerPage;
+            const endIndex = startIndex + filesPerPage;
+            const filesToDisplay = filteredFiles.slice(startIndex, endIndex);
+            
+            // عرض الملفات
+            filesToDisplay.forEach(file => {
                 const fileCard = document.createElement('div');
                 fileCard.className = `file-card grade-${file.grade}`;
                 
@@ -1222,7 +1285,7 @@
                         <a href="${file.previewLink}" target="_blank" class="btn btn-preview">
                             <i class="fas fa-eye"></i> معاينة
                         </a>
-                        <a href="${file.downloadLink}" class="btn btn-download">
+                        <a href="${file.downloadLink}" class="btn btn-download" download>
                             <i class="fas fa-download"></i> تنزيل
                         </a>
                     </div>
@@ -1230,35 +1293,83 @@
                 
                 container.appendChild(fileCard);
             });
+            
+            // إنشاء الترقيم الصفحي
+            createPagination();
         }
 
-        // فلترة الملفات حسب البحث والصف
+        // إنشاء واجهة الترقيم الصفحي
+        function createPagination() {
+            const pagination = document.getElementById('pagination');
+            const totalPages = Math.ceil(filteredFiles.length / filesPerPage);
+            
+            pagination.innerHTML = '';
+            
+            if (totalPages <= 1) return;
+            
+            // زر الصفحة السابقة
+            if (currentPage > 1) {
+                const prevBtn = document.createElement('button');
+                prevBtn.className = 'page-btn';
+                prevBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+                prevBtn.addEventListener('click', () => {
+                    currentPage--;
+                    displayFiles();
+                    window.scrollTo({top: 0, behavior: 'smooth'});
+                });
+                pagination.appendChild(prevBtn);
+            }
+            
+            // أزرار الصفحات
+            for (let i = 1; i <= totalPages; i++) {
+                const pageBtn = document.createElement('button');
+                pageBtn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+                pageBtn.textContent = i;
+                pageBtn.addEventListener('click', () => {
+                    currentPage = i;
+                    displayFiles();
+                    window.scrollTo({top: 0, behavior: 'smooth'});
+                });
+                pagination.appendChild(pageBtn);
+            }
+            
+            // زر الصفحة التالية
+            if (currentPage < totalPages) {
+                const nextBtn = document.createElement('button');
+                nextBtn.className = 'page-btn';
+                nextBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+                nextBtn.addEventListener('click', () => {
+                    currentPage++;
+                    displayFiles();
+                    window.scrollTo({top: 0, behavior: 'smooth'});
+                });
+                pagination.appendChild(nextBtn);
+            }
+        }
+
+        // فلترة الملفات حسب البحث والتصفية
         function filterFiles() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
             const selectedGrade = document.getElementById('gradeFilter').value;
+            const selectedSubject = document.getElementById('subjectFilter').value;
             
-            const filteredFiles = examFiles.filter(file => {
+            filteredFiles = examFiles.filter(file => {
                 const matchesSearch = 
                     file.title.toLowerCase().includes(searchTerm) || 
                     file.description.toLowerCase().includes(searchTerm) || 
                     file.subject.toLowerCase().includes(searchTerm) || 
-                    file.type.toLowerCase().includes(searchTerm);
+                    file.type.toLowerCase().includes(searchTerm) ||
+                    file.date.toLowerCase().includes(searchTerm);
                 
                 const matchesGrade = selectedGrade === 'all' || file.grade === selectedGrade;
+                const matchesSubject = selectedSubject === 'all' || file.subject === selectedSubject;
                 
-                return matchesSearch && matchesGrade;
+                return matchesSearch && matchesGrade && matchesSubject;
             });
             
-            displayFiles(filteredFiles);
+            currentPage = 1; // العودة إلى الصفحة الأولى بعد التصفية
+            displayFiles();
         }
-
-        // إضافة مستمعين للأحداث
-        document.getElementById('searchInput').addEventListener('input', filterFiles);
-        document.getElementById('gradeFilter').addEventListener('change', filterFiles);
-
-        // عرض جميع الملفات عند تحميل الصفحة
-        displayFiles(examFiles);
     </script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </body>
 </html>
